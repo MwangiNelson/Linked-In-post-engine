@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ivy's LinkedIn Writer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#eef1f5; --card:#ffffff; --ink:#0f1720; --muted:#5b6673;
+    --line:#e6e9ee; --brand:#0a66c2; --brand-2:#0b8fd6; --brand-dark:#004182;
+    --chip:#eef3f8; --ok:#0a7d3c; --ok-bg:#e6f5ec; --err:#b3391a; --err-bg:#fdeae4;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 20px rgba(16,24,40,.06);
+    --shadow-lg:0 10px 40px rgba(16,24,40,.12);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:
+      radial-gradient(1200px 500px at 100% -10%, #dbeafe55, transparent 60%),
+      radial-gradient(900px 500px at -10% 0%, #cffafe44, transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:30px 18px 100px}
+
+  /* header */
+  .hero{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .logo{width:46px;height:46px;border-radius:13px;flex:none;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
+    box-shadow:0 6px 16px rgba(10,102,194,.35)}
+  .hero h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.02em}
+  .hero p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+  .card h2{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 14px}
+
+  /* chips */
+  .chips{display:flex;flex-wrap:wrap;gap:9px}
+  .chip{border:1.5px solid var(--line);background:#fff;color:var(--ink);
+    border-radius:999px;padding:8px 15px;cursor:pointer;font:inherit;font-size:14px;
+    font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+  .chip:hover{border-color:var(--brand);transform:translateY(-1px)}
+  .chip.on{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;
+    border-color:transparent;box-shadow:0 4px 12px rgba(10,102,194,.28)}
+  .chip .x{opacity:.65;font-weight:700;font-size:15px;line-height:1;margin-left:2px}
+  .chip .x:hover{opacity:1;transform:scale(1.2)}
+
+  .addrow{display:flex;gap:9px;margin-top:14px}
+  input[type=text],textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;
+    padding:11px 13px;font:inherit;background:#fbfcfe;color:var(--ink);transition:.15s}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--brand);
+    box-shadow:0 0 0 4px rgba(10,102,194,.12);background:#fff}
+  textarea{resize:vertical;min-height:70px}
+
+  button{font:inherit;border:none;border-radius:999px;cursor:pointer;font-weight:600;transition:.15s}
+  .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;
+    padding:13px 24px;font-size:15px;box-shadow:0 6px 16px rgba(10,102,194,.3)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,102,194,.4)}
+  .btn-primary:disabled{opacity:.6;cursor:progress;transform:none;box-shadow:none}
+  .btn-add{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;padding:0 20px;white-space:nowrap}
+  .btn-ghost{background:#fff;color:var(--brand);border:1.5px solid var(--line);padding:9px 16px}
+  .btn-ghost:hover{border-color:var(--brand);background:#f5f9fd}
+  .btn-copy{background:var(--ink);color:#fff;padding:9px 18px}
+  .btn-copy:hover{background:#000}
+  .btn-copy.done{background:var(--ok)}
+
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .spacer{flex:1}
+  .hint{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .genbar{display:flex;align-items:center;gap:14px;margin-top:16px}
+
+  /* LinkedIn-style preview */
+  .preview{border:1px solid var(--line);border-radius:14px;background:#fff;
+    box-shadow:var(--shadow-lg);overflow:hidden}
+  .pv-head{display:flex;align-items:center;gap:12px;padding:16px 16px 4px}
+  .avatar{width:48px;height:48px;border-radius:50%;flex:none;color:#fff;font-weight:700;
+    display:grid;place-items:center;font-size:17px;
+    background:linear-gradient(135deg,#0a66c2,#0b8fd6)}
+  .pv-name{font-weight:700;font-size:15px;line-height:1.2}
+  .pv-sub{color:var(--muted);font-size:12.5px}
+  .pv-meta{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:5px;margin-top:2px}
+  .pv-body{padding:10px 16px 16px;white-space:pre-wrap;font-size:15px;line-height:1.6}
+  .pv-foot{border-top:1px solid var(--line);display:flex;justify-content:space-around;
+    padding:6px;color:var(--muted);font-size:13px;font-weight:600}
+  .pv-foot span{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px}
+  .pv-foot span:hover{background:#f3f6f9}
+
+  .badge{font-size:12px;padding:4px 11px;border-radius:999px;background:var(--chip);
+    color:var(--brand-dark);font-weight:600;display:inline-flex;align-items:center;gap:6px}
+  .badge.fb{background:#fff4e0;color:#8a5a00}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+  .meta{font-size:12.5px;color:var(--muted)}
+  .sources{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .sources .lbl{font-size:12px;color:var(--muted);font-weight:600}
+  .src{font-size:12px;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;
+    padding:4px 11px;color:var(--brand);text-decoration:none;max-width:230px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .src:hover{background:#e7f0fa}
+
+  .err{background:var(--err-bg);color:var(--err);padding:12px 15px;border-radius:12px;
+    margin-bottom:14px;font-weight:500;display:none;border:1px solid #f4c9ba}
+
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:14px;
+    font-weight:500;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow-lg)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .spin{display:inline-block;width:15px;height:15px;border:2.5px solid #ffffff88;
+    border-top-color:#fff;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:9px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .hidden{display:none}
+
+  /* skeleton */
+  .sk{background:linear-gradient(90deg,#eef1f5 25%,#e3e8ee 37%,#eef1f5 63%);
+    background-size:400% 100%;animation:sh 1.3s ease infinite;border-radius:7px}
+  @keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  .sk-line{height:13px;margin:9px 16px}
+
+  @media(max-width:560px){.wrap{padding:20px 14px 90px}.hero h1{font-size:19px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="logo">IN</div>
+    <div>
+      <h1>Ivy's LinkedIn Writer</h1>
+      <p>Current-affairs posts in Ivy Ndung'u's voice — pick a topic, generate, copy, post.</p>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <!-- Topics -->
+  <div class="card">
+    <h2>1 · Choose a topic</h2>
+    <div class="chips" id="chips"></div>
+    <div class="addrow">
+      <input type="text" id="newTopic" placeholder="Add your own topic — e.g. parametric insurance…" maxlength="60" />
+      <button class="btn-add" id="addBtn" type="button">Add</button>
+    </div>
+    <p class="hint">Custom topics save in this browser. Tap the × on a custom chip to remove it.</p>
+  </div>
+
+  <!-- Guidance + generate -->
+  <div class="card">
+    <h2>2 · Optional angle</h2>
+    <textarea id="guidance" placeholder="Leave blank to let Ivy decide, or nudge it — “tie it to a recent Kenya report”, “keep it reflective”…"></textarea>
+    <div class="genbar">
+      <button class="btn-primary" id="genBtn" type="button">✍️ Write the post</button>
+      <span class="meta" id="selNote"></span>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="card hidden" id="outCard">
+    <div class="row" style="margin-bottom:14px">
+      <h2 style="margin:0">3 · Preview</h2>
+      <div class="spacer"></div>
+      <button class="btn-ghost" id="regenBtn" type="button">↻ Regenerate</button>
+      <button class="btn-copy" id="copyBtn" type="button">Copy</button>
+    </div>
+
+    <div class="preview" id="preview">
+      <div class="pv-head">
+        <div class="avatar">IN</div>
+        <div>
+          <div class="pv-name">Ivy Nyakinywa Ndung'u</div>
+          <div class="pv-sub">Actuarial Associate at Inclusivity Solutions</div>
+          <div class="pv-meta">Now · <span>🌐</span> Anyone</div>
+        </div>
+      </div>
+      <div class="pv-body" id="out"></div>
+      <div class="pv-foot">
+        <span>👍 Like</span><span>💬 Comment</span><span>↻ Repost</span><span>➤ Send</span>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:14px">
+      <span class="badge" id="modelBadge"></span>
+      <span class="meta" id="charNote"></span>
+    </div>
+    <div class="sources" id="sources"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const DEFAULT_TOPICS = ["Insurance","Microinsurance","Climate risk","Sustainability impact","Actuarial data"];
+  const LS_KEY = "ivy_custom_topics_v1";
+  let selected = DEFAULT_TOPICS[0];
+
+  const $ = (id)=>document.getElementById(id);
+  const load = ()=>{ try{return JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{return [];} };
+  const save = (a)=>localStorage.setItem(LS_KEY, JSON.stringify(a));
+
+  function renderChips(){
+    const custom = load(), chips = $("chips"); chips.innerHTML="";
+    [...DEFAULT_TOPICS.map(t=>({t,c:false})), ...custom.map(t=>({t,c:true}))].forEach(({t,c})=>{
+      const b=document.createElement("button");
+      b.className="chip"+(t===selected?" on":""); b.type="button";
+      b.innerHTML=`<span>${escapeHtml(t)}</span>`+(c?` <span class="x" title="Remove" data-x="${escapeHtml(t)}">×</span>`:"");
+      b.onclick=(e)=>{ if(e.target.dataset.x){removeTopic(e.target.dataset.x);return;} selected=t; renderChips(); updateNote(); };
+      chips.appendChild(b);
+    });
+  }
+  function addTopic(){
+    const v=$("newTopic").value.trim(); if(!v) return;
+    const custom=load();
+    if(![...DEFAULT_TOPICS,...custom].some(x=>x.toLowerCase()===v.toLowerCase())){custom.push(v);save(custom);}
+    selected=v; $("newTopic").value=""; renderChips(); updateNote();
+  }
+  function removeTopic(t){ save(load().filter(x=>x!==t)); if(selected===t) selected=DEFAULT_TOPICS[0]; renderChips(); updateNote(); }
+  function updateNote(){ $("selNote").textContent="Topic: "+selected; }
+
+  function skeleton(){
+    $("outCard").classList.remove("hidden");
+    $("out").innerHTML = '<div class="sk sk-line" style="width:92%"></div><div class="sk sk-line" style="width:88%"></div><div class="sk sk-line" style="width:95%"></div><div class="sk sk-line" style="width:70%"></div><div class="sk sk-line" style="width:80%"></div>';
+    $("modelBadge").textContent=""; $("charNote").textContent=""; $("sources").innerHTML="";
+    $("outCard").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  async function generate(){
+    hideErr();
+    const btn=$("genBtn"), regen=$("regenBtn");
+    btn.disabled=true; regen.disabled=true;
+    btn.innerHTML='<span class="spin"></span>Researching + writing…';
+    skeleton();
+    try{
+      const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({topic:selected,guidance:$("guidance").value})});
+      const data=await r.json();
+      if(!r.ok) throw new Error(data.error||"Something went wrong.");
+      showPost(data);
+    }catch(e){ showErr(e.message); $("outCard").classList.add("hidden"); }
+    finally{ btn.disabled=false; regen.disabled=false; btn.innerHTML="✍️ Write the post"; }
+  }
+
+  function showPost(data){
+    $("outCard").classList.remove("hidden");
+    $("out").textContent=data.post;
+    const badge=$("modelBadge");
+    badge.innerHTML=`<span class="dot"></span> Written by ${data.provider==="groq"?"Groq":"Gemini"}${data.model?" · "+data.model:""}`;
+    badge.className="badge"+(data.fellBack?" fb":"");
+    if(data.fellBack) badge.innerHTML+=" (fallback)";
+    const n=data.chars;
+    $("charNote").textContent=`${n} characters${n>3000?" · over LinkedIn's 3000 limit":""}`;
+    const src=$("sources");
+    if(data.sources&&data.sources.length){
+      src.innerHTML='<span class="lbl">Sources</span>'+data.sources
+        .map(s=>`<a class="src" href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.title||hostname(s.url))}</a>`).join("");
+    } else src.innerHTML="";
+  }
+
+  async function copyPost(){
+    const btn=$("copyBtn");
+    try{ await navigator.clipboard.writeText($("out").textContent); }
+    catch{ const r=document.createRange(); r.selectNode($("out"));
+      const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand("copy"); sel.removeAllRanges(); }
+    btn.textContent="✓ Copied"; btn.classList.add("done");
+    toast("Copied — paste it into LinkedIn.");
+    setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("done");},2000);
+  }
+
+  let tt; function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2400); }
+  function showErr(m){ const e=$("err"); e.textContent="⚠ "+m; e.style.display="block"; e.scrollIntoView({behavior:"smooth",block:"center"}); }
+  function hideErr(){ $("err").style.display="none"; }
+  function hostname(u){ try{return new URL(u).hostname.replace(/^www\./,"");}catch{return u;} }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+  $("addBtn").onclick=addTopic;
+  $("newTopic").addEventListener("keydown",e=>{if(e.key==="Enter")addTopic();});
+  $("genBtn").onclick=generate; $("regenBtn").onclick=generate; $("copyBtn").onclick=copyPost;
+  renderChips(); updateNote();
+</script>
+</body>
+</html>

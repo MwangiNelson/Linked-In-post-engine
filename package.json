@@ -1,0 +1,13 @@
+{
+  "name": "linkedin-writer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI LinkedIn post writer in Ivy Ndung'u's voice — Groq + Gemini with web search and automatic fallback.",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
