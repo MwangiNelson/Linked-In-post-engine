@@ -3,6 +3,9 @@
   "functions": {
     "api/generate.js": {
       "maxDuration": 60
+    },
+    "api/refine.js": {
+      "maxDuration": 60
     }
   }
 }
