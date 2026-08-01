@@ -24,7 +24,10 @@ const path = require("path");
   }
 })();
 
-const generate = require("./api/generate");
+const API = {
+  "/api/generate": require("./api/generate"),
+  "/api/refine": require("./api/refine"),
+};
 
 const PORT = process.env.PORT || 3100;
 const PUBLIC = path.join(__dirname, "public");
@@ -39,11 +42,12 @@ const MIME = {
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
-  // API route -> Vercel-style handler. Add a .status()/.json() shim.
-  if (url.pathname === "/api/generate") {
+  // API routes -> Vercel-style handlers. Add a .status()/.json() shim.
+  const handler = API[url.pathname];
+  if (handler) {
     shimRes(res);
     try {
-      await generate(req, res);
+      await handler(req, res);
     } catch (e) {
       if (!res.headersSent) res.status(500).json({ error: e.message });
     }

@@ -2,286 +2,894 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
 <title>Ivy's LinkedIn Writer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --bg:#eef1f5; --card:#ffffff; --ink:#0f1720; --muted:#5b6673;
-    --line:#e6e9ee; --brand:#0a66c2; --brand-2:#0b8fd6; --brand-dark:#004182;
-    --chip:#eef3f8; --ok:#0a7d3c; --ok-bg:#e6f5ec; --err:#b3391a; --err-bg:#fdeae4;
-    --shadow:0 1px 2px rgba(16,24,40,.04),0 6px 20px rgba(16,24,40,.06);
-    --shadow-lg:0 10px 40px rgba(16,24,40,.12);
-    --radius:16px;
+    --bg:#f3f5f7; --surface:#fff; --surface-2:#f7f9fb;
+    --ink:#111a24; --ink-2:#3d4854; --muted:#68727e;
+    --line:#e3e7ec; --line-2:#eef1f5;
+    --brand:#0a66c2; --brand-ink:#004182; --brand-wash:#eaf3fb;
+    --ok:#0a7d3c; --warn:#8a5300; --warn-bg:#fff6e5;
+    --err:#a33113; --err-bg:#fdeee8; --err-line:#f3c9b9;
+    --sh-1:0 1px 2px rgba(17,26,36,.05);
+    --sh-2:0 2px 4px rgba(17,26,36,.05), 0 8px 24px rgba(17,26,36,.07);
+    --sh-3:0 -1px 0 var(--line), 0 -8px 24px rgba(17,26,36,.06);
+    --r-sm:9px; --r-md:12px; --r-lg:16px;
+    --bar:64px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0}
-  body{background:
-      radial-gradient(1200px 500px at 100% -10%, #dbeafe55, transparent 60%),
-      radial-gradient(900px 500px at -10% 0%, #cffafe44, transparent 55%),
-      var(--bg);
-    color:var(--ink);
-    font-family:Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:760px;margin:0 auto;padding:30px 18px 100px}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:none}
 
-  /* header */
-  .hero{display:flex;align-items:center;gap:14px;margin-bottom:22px}
-  .logo{width:46px;height:46px;border-radius:13px;flex:none;
-    background:linear-gradient(135deg,var(--brand),var(--brand-2));
-    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
-    box-shadow:0 6px 16px rgba(10,102,194,.35)}
-  .hero h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.02em}
-  .hero p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+  /* ---------- shell (mobile first) ---------- */
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.92);
+    backdrop-filter:saturate(1.6) blur(12px);border-bottom:1px solid var(--line);
+    padding:max(8px,env(safe-area-inset-top)) 14px 8px}
+  .topbar-in{display:flex;align-items:center;gap:10px;max-width:1080px;margin:0 auto}
+  .mark{width:30px;height:30px;border-radius:8px;flex:none;background:var(--brand);
+    color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:-.02em}
+  .topbar h1{margin:0;font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+  .topbar .sub{display:none;color:var(--muted);font-size:13px;line-height:1.2}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
-    box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
-  .card h2{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--muted);margin:0 0 14px}
+  .wrap{max-width:1080px;margin:0 auto;padding:12px 14px calc(var(--bar) + 28px)}
+  .layout{display:block}
 
-  /* chips */
-  .chips{display:flex;flex-wrap:wrap;gap:9px}
-  .chip{border:1.5px solid var(--line);background:#fff;color:var(--ink);
-    border-radius:999px;padding:8px 15px;cursor:pointer;font:inherit;font-size:14px;
-    font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:.15s}
-  .chip:hover{border-color:var(--brand);transform:translateY(-1px)}
-  .chip.on{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;
-    border-color:transparent;box-shadow:0 4px 12px rgba(10,102,194,.28)}
-  .chip .x{opacity:.65;font-weight:700;font-size:15px;line-height:1;margin-left:2px}
-  .chip .x:hover{opacity:1;transform:scale(1.2)}
+  /* ---------- panels ---------- */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:14px;margin-bottom:10px}
+  .panel + .panel{margin-top:0}
+  .plabel{display:flex;align-items:baseline;gap:8px;margin:0 0 10px;
+    font-size:13px;font-weight:600;color:var(--ink-2)}
+  .plabel .opt{font-weight:400;color:var(--muted);font-size:12px}
 
-  .addrow{display:flex;gap:9px;margin-top:14px}
-  input[type=text],textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;
-    padding:11px 13px;font:inherit;background:#fbfcfe;color:var(--ink);transition:.15s}
-  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--brand);
-    box-shadow:0 0 0 4px rgba(10,102,194,.12);background:#fff}
-  textarea{resize:vertical;min-height:70px}
+  /* ---------- chips ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{display:inline-flex;align-items:stretch;border:1px solid var(--line);
+    background:var(--surface);border-radius:999px;overflow:hidden;transition:border-color .12s,background .12s}
+  .chip button{background:none;border:0;font:inherit;font-size:15px;color:var(--ink-2);
+    cursor:pointer;padding:9px 13px;min-height:38px;line-height:1.2}
+  .chip .x{padding-left:2px;padding-right:11px;color:var(--muted);font-size:17px;line-height:1}
+  .chip.on{background:var(--brand);border-color:var(--brand)}
+  .chip.on button{color:#fff;font-weight:500}
+  .chip button:focus-visible{outline:2px solid var(--brand);outline-offset:-2px;border-radius:999px}
 
-  button{font:inherit;border:none;border-radius:999px;cursor:pointer;font-weight:600;transition:.15s}
-  .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;
-    padding:13px 24px;font-size:15px;box-shadow:0 6px 16px rgba(10,102,194,.3)}
-  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,102,194,.4)}
-  .btn-primary:disabled{opacity:.6;cursor:progress;transform:none;box-shadow:none}
-  .btn-add{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;padding:0 20px;white-space:nowrap}
-  .btn-ghost{background:#fff;color:var(--brand);border:1.5px solid var(--line);padding:9px 16px}
-  .btn-ghost:hover{border-color:var(--brand);background:#f5f9fd}
-  .btn-copy{background:var(--ink);color:#fff;padding:9px 18px}
-  .btn-copy:hover{background:#000}
-  .btn-copy.done{background:var(--ok)}
+  /* ---------- fields ---------- */
+  .field{width:100%;border:1px solid var(--line);border-radius:var(--r-md);
+    padding:11px 12px;font:inherit;font-size:16px;background:var(--surface-2);
+    color:var(--ink);transition:border-color .12s,background .12s,box-shadow .12s}
+  .field::placeholder{color:var(--muted)}
+  .field:focus{outline:none;border-color:var(--brand);background:var(--surface);
+    box-shadow:0 0 0 3px rgba(10,102,194,.14)}
+  textarea.field{resize:none;min-height:44px;overflow:hidden;line-height:1.45}
+  .addrow{display:flex;gap:7px;margin-top:10px}
+  .addrow .field{flex:1;min-width:0}
+  .hint{color:var(--muted);font-size:12px;margin:8px 0 0}
 
-  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .spacer{flex:1}
-  .hint{color:var(--muted);font-size:12.5px;margin-top:10px}
-  .genbar{display:flex;align-items:center;gap:14px;margin-top:16px}
+  /* ---------- buttons ---------- */
+  button{font:inherit;cursor:pointer}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    border:1px solid transparent;border-radius:var(--r-md);font-weight:600;font-size:15px;
+    padding:0 16px;min-height:44px;white-space:nowrap;transition:background .12s,border-color .12s,color .12s,opacity .12s}
+  .btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-secondary{background:var(--surface);color:var(--ink-2);border-color:var(--line)}
+  .btn-quiet{background:transparent;color:var(--muted);border-color:transparent;
+    padding:0 10px;min-height:36px;font-size:13px;font-weight:500}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn-primary.done{background:var(--ok)}
+  @media (hover:hover){
+    .btn-primary:hover:not(:disabled){background:var(--brand-ink)}
+    .btn-secondary:hover:not(:disabled){border-color:#c9d2dc;background:var(--surface-2)}
+    .btn-quiet:hover:not(:disabled){background:var(--line-2);color:var(--ink-2)}
+    .chip:hover{border-color:#c9d2dc}
+    .chip.on:hover{border-color:var(--brand-ink);background:var(--brand-ink)}
+  }
 
-  /* LinkedIn-style preview */
-  .preview{border:1px solid var(--line);border-radius:14px;background:#fff;
-    box-shadow:var(--shadow-lg);overflow:hidden}
-  .pv-head{display:flex;align-items:center;gap:12px;padding:16px 16px 4px}
-  .avatar{width:48px;height:48px;border-radius:50%;flex:none;color:#fff;font-weight:700;
-    display:grid;place-items:center;font-size:17px;
-    background:linear-gradient(135deg,#0a66c2,#0b8fd6)}
-  .pv-name{font-weight:700;font-size:15px;line-height:1.2}
-  .pv-sub{color:var(--muted);font-size:12.5px}
-  .pv-meta{color:var(--muted);font-size:12px;display:flex;align-items:center;gap:5px;margin-top:2px}
-  .pv-body{padding:10px 16px 16px;white-space:pre-wrap;font-size:15px;line-height:1.6}
-  .pv-foot{border-top:1px solid var(--line);display:flex;justify-content:space-around;
-    padding:6px;color:var(--muted);font-size:13px;font-weight:600}
-  .pv-foot span{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px}
-  .pv-foot span:hover{background:#f3f6f9}
+  /* ---------- action bar ---------- */
+  .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:rgba(255,255,255,.94);backdrop-filter:saturate(1.6) blur(12px);
+    box-shadow:var(--sh-3);
+    padding:9px 14px calc(9px + env(safe-area-inset-bottom));
+    transition:transform .22s ease}
+  .actionbar-in{display:flex;gap:8px;max-width:1080px;margin:0 auto}
+  .actionbar .grow{flex:1;min-width:0}
+  body.editing .actionbar{transform:translateY(130%)}
 
-  .badge{font-size:12px;padding:4px 11px;border-radius:999px;background:var(--chip);
-    color:var(--brand-dark);font-weight:600;display:inline-flex;align-items:center;gap:6px}
-  .badge.fb{background:#fff4e0;color:#8a5a00}
-  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
-  .meta{font-size:12.5px;color:var(--muted)}
-  .sources{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  /* ---------- composer ---------- */
+  /* No overflow:hidden here: it would make the panel a scroll container and the
+     sticky toolbar would offset against the panel instead of the page. Corners
+     are clipped on the edge children instead. */
+  .composer{padding:0}
+  .composer > :last-child{border-radius:0 0 var(--r-lg) var(--r-lg)}
+  .toolbar{position:sticky;top:47px;z-index:20;display:flex;align-items:center;gap:2px;
+    padding:7px 8px;background:var(--surface);border-bottom:1px solid var(--line-2);
+    border-radius:var(--r-lg) var(--r-lg) 0 0;
+    overflow-x:auto;scrollbar-width:none}
+  .toolbar::-webkit-scrollbar{display:none}
+  .tool{display:grid;place-items:center;width:38px;height:38px;flex:none;border:0;
+    border-radius:var(--r-sm);background:none;color:var(--ink-2);font-size:15px;
+    transition:background .12s,color .12s}
+  .tool[aria-pressed=true]{background:var(--brand-wash);color:var(--brand-ink)}
+  .tool:disabled{opacity:.35}
+  .tool:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+  .tool b{font-weight:700}.tool i{font-family:Georgia,serif}
+  .tool.wide{width:auto;gap:6px;padding:0 11px;font-size:13px;font-weight:500}
+  .tool-sep{width:1px;height:20px;background:var(--line);margin:0 5px;flex:none}
+  @media (hover:hover){.tool:hover:not(:disabled){background:var(--line-2)}}
+
+  .post{background:var(--surface)}
+  .post-head{display:flex;align-items:center;gap:10px;padding:13px 14px 0}
+  .avatar{width:42px;height:42px;border-radius:50%;flex:none;background:var(--brand);
+    color:#fff;display:grid;place-items:center;font-weight:600;font-size:15px}
+  .post-name{font-weight:600;font-size:15px;line-height:1.25}
+  .post-role{color:var(--muted);font-size:12px;line-height:1.3}
+  .post-when{color:var(--muted);font-size:12px;line-height:1.3}
+
+  .editor{padding:10px 14px 14px;font-size:17px;line-height:1.55;
+    white-space:pre-wrap;word-break:break-word;min-height:180px;outline:none}
+  .editor:focus{background:#fcfdfe}
+  .editor[data-empty=true]:before{content:attr(data-ph);color:var(--muted);pointer-events:none}
+  .editor b,.editor strong{font-weight:700}
+  .editor ul,.editor ol{margin:6px 0;padding-left:22px}
+
+  .post-actions{display:flex;justify-content:space-around;border-top:1px solid var(--line-2);
+    padding:3px;color:var(--muted);font-size:13px;font-weight:600}
+  .post-actions span{padding:9px 8px;border-radius:var(--r-sm)}
+
+  /* ---------- status strip ---------- */
+  .status{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;
+    padding:10px 14px;border-top:1px solid var(--line-2);background:var(--surface-2)}
+  .stat{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .stat strong{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums}
+  .stat.warn strong,.stat.warn{color:var(--warn)}
+  .meter{width:56px;height:4px;border-radius:999px;background:var(--line);overflow:hidden}
+  .meter i{display:block;height:100%;width:100%;background:var(--brand);border-radius:999px;
+    transform-origin:left;transform:scaleX(0);transition:transform .2s}
+  .meter.warn i{background:var(--warn)}
+  .status .grow{flex:1}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
+    color:var(--muted)}
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:none}
+  .badge.fb .dot{background:#d08700}
+
+  .sources{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 14px;
+    border-top:1px solid var(--line-2)}
   .sources .lbl{font-size:12px;color:var(--muted);font-weight:600}
-  .src{font-size:12px;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;
-    padding:4px 11px;color:var(--brand);text-decoration:none;max-width:230px;overflow:hidden;
-    text-overflow:ellipsis;white-space:nowrap}
-  .src:hover{background:#e7f0fa}
+  .src{font-size:12px;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:999px;padding:5px 11px;color:var(--brand);text-decoration:none;
+    max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  .err{background:var(--err-bg);color:var(--err);padding:12px 15px;border-radius:12px;
-    margin-bottom:14px;font-weight:500;display:none;border:1px solid #f4c9ba}
+  /* ---------- empty state ---------- */
+  .empty{padding:34px 20px;text-align:center;color:var(--muted)}
+  .empty svg{opacity:.5;margin-bottom:10px}
+  .empty p{margin:0;font-size:13px;max-width:32ch;margin-inline:auto}
 
-  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
-    background:var(--ink);color:#fff;padding:12px 20px;border-radius:999px;font-size:14px;
-    font-weight:500;opacity:0;pointer-events:none;transition:.25s;box-shadow:var(--shadow-lg)}
+  /* ---------- refine sheet ---------- */
+  .scrim{position:fixed;inset:0;z-index:50;background:rgba(17,26,36,.35);
+    opacity:0;pointer-events:none;transition:opacity .2s}
+  .scrim.open{opacity:1;pointer-events:auto}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--surface);
+    border-radius:18px 18px 0 0;box-shadow:0 -8px 40px rgba(17,26,36,.18);
+    padding:8px 14px calc(14px + env(safe-area-inset-bottom));
+    transform:translateY(101%);max-height:82vh;overflow-y:auto;
+    /* hidden until opened, so the closed sheet keeps its controls out of the
+       tab order and its shadow off the page */
+    visibility:hidden;
+    transition:transform .26s cubic-bezier(.32,.72,0,1),visibility 0s linear .26s}
+  .sheet.open{transform:translateY(0);visibility:visible;transition-delay:0s}
+  .grabber{width:36px;height:4px;border-radius:999px;background:var(--line);
+    margin:2px auto 12px}
+  .sheet h2{margin:0 0 3px;font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .sheet .lede{margin:0 0 12px;font-size:13px;color:var(--muted)}
+  .sheet .chips{margin-bottom:11px}
+  .sheet .chip button{font-size:13px;padding:8px 12px;min-height:36px}
+  .sheet .row{display:flex;gap:8px;margin-top:10px}
+  .sheet .row .btn{flex:1}
+
+  /* ---------- feedback ---------- */
+  .err{display:none;align-items:flex-start;gap:9px;background:var(--err-bg);
+    color:var(--err);border:1px solid var(--err-line);border-radius:var(--r-md);
+    padding:11px 13px;margin-bottom:10px;font-size:15px}
+  .err.show{display:flex}
+  .err b{font-weight:600}
+  .toast{position:fixed;left:50%;bottom:calc(var(--bar) + 16px + env(safe-area-inset-bottom));
+    z-index:70;transform:translateX(-50%) translateY(10px);background:var(--ink);color:#fff;
+    padding:10px 18px;border-radius:999px;font-size:15px;font-weight:500;
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:92vw}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  .spin{display:inline-block;width:15px;height:15px;border:2.5px solid #ffffff88;
-    border-top-color:#fff;border-radius:50%;animation:s .7s linear infinite;vertical-align:-2px;margin-right:9px}
-  @keyframes s{to{transform:rotate(360deg)}}
-  .hidden{display:none}
+  .spin{width:15px;height:15px;flex:none;border:2px solid currentColor;border-top-color:transparent;
+    border-radius:50%;animation:spin .7s linear infinite;opacity:.9}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sk{background:linear-gradient(90deg,var(--line-2) 25%,var(--line) 37%,var(--line-2) 63%);
+    background-size:400% 100%;animation:sheen 1.4s ease infinite;border-radius:5px;height:12px;margin:10px 0}
+  @keyframes sheen{0%{background-position:100% 0}100%{background-position:-100% 0}}
+  .hidden{display:none !important}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .reveal{animation:rise .3s cubic-bezier(.2,.8,.3,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-  /* skeleton */
-  .sk{background:linear-gradient(90deg,#eef1f5 25%,#e3e8ee 37%,#eef1f5 63%);
-    background-size:400% 100%;animation:sh 1.3s ease infinite;border-radius:7px}
-  @keyframes sh{0%{background-position:100% 0}100%{background-position:-100% 0}}
-  .sk-line{height:13px;margin:9px 16px}
+  /* ---------- roomier phones / tablets ---------- */
+  @media (min-width:600px){
+    .wrap{padding:18px 20px calc(var(--bar) + 32px)}
+    .panel{padding:16px 18px;margin-bottom:12px}
+    .topbar{padding-inline:20px}
+    .topbar .sub{display:block}
+    .post-head,.editor,.status,.sources{padding-inline:18px}
+    .toolbar{padding-inline:12px}
+    .sheet{left:50%;right:auto;transform:translate(-50%,101%);width:min(560px,100%);
+      border-radius:18px 18px 0 0}
+    .sheet.open{transform:translate(-50%,0);visibility:visible;transition-delay:0s}
+  }
 
-  @media(max-width:560px){.wrap{padding:20px 14px 90px}.hero h1{font-size:19px}}
+  /* ---------- two columns: controls beside the draft ---------- */
+  @media (min-width:900px){
+    .wrap{padding-bottom:32px}
+    .layout{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);
+      gap:18px;align-items:start}
+    .controls{position:sticky;top:64px}
+    .actionbar{position:static;background:none;backdrop-filter:none;box-shadow:none;padding:0}
+    .actionbar-in{flex-wrap:wrap}
+    .actionbar .btn{flex:1}
+    body.editing .actionbar{transform:none}
+    .editor{min-height:340px;font-size:16px}
+    .toast{bottom:24px}
+    .empty{padding:64px 24px}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *,*:before,*:after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="hero">
-    <div class="logo">IN</div>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="mark" aria-hidden="true">IN</div>
     <div>
       <h1>Ivy's LinkedIn Writer</h1>
-      <p>Current-affairs posts in Ivy Ndung'u's voice — pick a topic, generate, copy, post.</p>
+      <p class="sub">Current-affairs posts in Ivy Ndung'u's voice.</p>
     </div>
   </div>
+</header>
 
-  <div class="err" id="err"></div>
+<div class="wrap">
+  <div class="err" id="err" role="alert"><b>&#9888;</b><span id="errMsg"></span></div>
 
-  <!-- Topics -->
-  <div class="card">
-    <h2>1 · Choose a topic</h2>
-    <div class="chips" id="chips"></div>
-    <div class="addrow">
-      <input type="text" id="newTopic" placeholder="Add your own topic — e.g. parametric insurance…" maxlength="60" />
-      <button class="btn-add" id="addBtn" type="button">Add</button>
-    </div>
-    <p class="hint">Custom topics save in this browser. Tap the × on a custom chip to remove it.</p>
-  </div>
+  <div class="layout">
 
-  <!-- Guidance + generate -->
-  <div class="card">
-    <h2>2 · Optional angle</h2>
-    <textarea id="guidance" placeholder="Leave blank to let Ivy decide, or nudge it — “tie it to a recent Kenya report”, “keep it reflective”…"></textarea>
-    <div class="genbar">
-      <button class="btn-primary" id="genBtn" type="button">✍️ Write the post</button>
-      <span class="meta" id="selNote"></span>
-    </div>
-  </div>
+    <!-- ---------------- controls ---------------- -->
+    <div class="controls">
+      <section class="panel">
+        <h2 class="plabel">Topic</h2>
+        <div class="chips" id="chips"></div>
+        <div class="addrow">
+          <input type="text" id="newTopic" class="field" maxlength="60"
+                 placeholder="Add a topic&hellip;" aria-label="Add your own topic" />
+          <button class="btn btn-secondary" id="addBtn" type="button">Add</button>
+        </div>
+        <p class="hint">Your own topics stay in this browser.</p>
+      </section>
 
-  <!-- Output -->
-  <div class="card hidden" id="outCard">
-    <div class="row" style="margin-bottom:14px">
-      <h2 style="margin:0">3 · Preview</h2>
-      <div class="spacer"></div>
-      <button class="btn-ghost" id="regenBtn" type="button">↻ Regenerate</button>
-      <button class="btn-copy" id="copyBtn" type="button">Copy</button>
-    </div>
+      <section class="panel">
+        <h2 class="plabel">Angle <span class="opt">optional</span></h2>
+        <textarea id="guidance" class="field" rows="1"
+          placeholder="Tie it to a recent Kenya report, keep it reflective&hellip;"
+          aria-label="Optional angle or guidance"></textarea>
+      </section>
 
-    <div class="preview" id="preview">
-      <div class="pv-head">
-        <div class="avatar">IN</div>
-        <div>
-          <div class="pv-name">Ivy Nyakinywa Ndung'u</div>
-          <div class="pv-sub">Actuarial Associate at Inclusivity Solutions</div>
-          <div class="pv-meta">Now · <span>🌐</span> Anyone</div>
+      <div class="actionbar">
+        <div class="actionbar-in">
+          <button class="btn btn-primary grow" id="genBtn" type="button">Write the post</button>
+          <button class="btn btn-secondary hidden" id="refineBtn" type="button">Refine</button>
+          <button class="btn btn-secondary hidden" id="copyBtn" type="button">Copy</button>
         </div>
       </div>
-      <div class="pv-body" id="out"></div>
-      <div class="pv-foot">
-        <span>👍 Like</span><span>💬 Comment</span><span>↻ Repost</span><span>➤ Send</span>
-      </div>
     </div>
 
-    <div class="row" style="margin-top:14px">
-      <span class="badge" id="modelBadge"></span>
-      <span class="meta" id="charNote"></span>
+    <!-- ---------------- draft ---------------- -->
+    <div class="output">
+      <section class="panel composer" id="composer">
+
+        <div class="toolbar" id="toolbar" role="toolbar" aria-label="Formatting" aria-controls="editor">
+          <button class="tool" type="button" data-cmd="bold" aria-pressed="false"
+                  title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button>
+          <button class="tool" type="button" data-cmd="italic" aria-pressed="false"
+                  title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button>
+          <span class="tool-sep" aria-hidden="true"></span>
+          <button class="tool" type="button" data-cmd="insertUnorderedList" aria-pressed="false"
+                  title="Bullet list" aria-label="Bullet list">&bull;</button>
+          <button class="tool" type="button" data-cmd="insertOrderedList" aria-pressed="false"
+                  title="Numbered list" aria-label="Numbered list">1.</button>
+          <span class="tool-sep" aria-hidden="true"></span>
+          <button class="tool" type="button" data-cmd="undo" title="Undo" aria-label="Undo">&#8630;</button>
+          <button class="tool" type="button" data-cmd="redo" title="Redo" aria-label="Redo">&#8631;</button>
+        </div>
+
+        <div class="post">
+          <div class="post-head">
+            <div class="avatar" aria-hidden="true">IN</div>
+            <div>
+              <div class="post-name">Ivy Nyakinywa Ndung'u</div>
+              <div class="post-role">Actuarial Associate at Inclusivity Solutions</div>
+              <div class="post-when">Now &middot; Anyone</div>
+            </div>
+          </div>
+
+          <div class="editor" id="editor" contenteditable="true" spellcheck="true"
+               role="textbox" aria-multiline="true" aria-label="Post text, editable"
+               data-empty="true" data-ph="Your post appears here. Edit it like any document."></div>
+
+          <div class="post-actions" aria-hidden="true">
+            <span>Like</span><span>Comment</span><span>Repost</span><span>Send</span>
+          </div>
+        </div>
+
+        <div class="status" id="status">
+          <span class="stat" id="countStat" title="LinkedIn allows 3,000 characters">
+            <span class="meter" id="countMeter"><i></i></span>
+            <span><strong id="countNum">0</strong> / 3,000</span>
+          </span>
+          <span class="stat" id="hookStat"
+                title="LinkedIn shows about 210 characters before &ldquo;see more&rdquo;. A first line under about 90 characters lands hardest.">
+            opening <strong id="hookNum">0</strong>
+          </span>
+          <span class="grow"></span>
+          <button class="btn btn-quiet" type="button" id="revertBtn" disabled
+                  title="Go back to the draft before the last refine">&#8634; Previous draft</button>
+          <span class="badge" id="modelBadge"></span>
+        </div>
+
+        <div class="sources hidden" id="sources"></div>
+      </section>
+
+      <section class="panel empty" id="empty">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 5h16M4 10h16M4 15h10"/><path d="M17 19l2 2 4-4"/>
+        </svg>
+        <p>Pick a topic and write the post. It lands here, fully editable, before you copy it across.</p>
+      </section>
     </div>
-    <div class="sources" id="sources"></div>
+
   </div>
-
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- ---------------- refine sheet ---------------- -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+  <div class="grabber" aria-hidden="true"></div>
+  <h2 id="sheetTitle">Refine the draft</h2>
+  <p class="lede">Ivy's current text goes back to the model, so it edits rather than starts over.</p>
+  <div class="chips" id="refineChips"></div>
+  <textarea id="refineText" class="field" rows="2"
+    placeholder="Or say it in your own words&hellip;" aria-label="Your own refine instruction"></textarea>
+  <div class="row">
+    <button class="btn btn-secondary" id="sheetCancel" type="button">Cancel</button>
+    <button class="btn btn-primary" id="sheetGo" type="button">Refine</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-  const DEFAULT_TOPICS = ["Insurance","Microinsurance","Climate risk","Sustainability impact","Actuarial data"];
-  const LS_KEY = "ivy_custom_topics_v1";
-  let selected = DEFAULT_TOPICS[0];
+(function(){
+  "use strict";
 
-  const $ = (id)=>document.getElementById(id);
-  const load = ()=>{ try{return JSON.parse(localStorage.getItem(LS_KEY))||[];}catch{return [];} };
-  const save = (a)=>localStorage.setItem(LS_KEY, JSON.stringify(a));
+  var DEFAULT_TOPICS = ["Insurance","Microinsurance","Climate risk","Sustainability impact","Actuarial data"];
+  var REFINEMENTS = [
+    {label:"Sharper hook",  text:"Rewrite the opening. The first line must be one concrete sentence under 12 words that sets up exactly what the post argues, then a blank line, then the turn."},
+    {label:"Shorter",       text:"Cut it to about 140 words. Remove anything that does not earn its place. Keep the strongest concrete detail."},
+    {label:"More data",     text:"Use web search to add one more real, recent, specific figure with its source named in the text. Do not invent numbers."},
+    {label:"Warmer",        text:"Make it warmer and more personal. Bring in the human stakes for the people who are connected but unprotected, without getting sentimental."},
+    {label:"Less jargon",   text:"Replace insurance and actuarial jargon with plain words a non-specialist would follow. Keep the technical accuracy."},
+    {label:"Stronger close",text:"Rewrite the last two lines. The closing question should be honest and specific to the argument, not generic. Refresh the hashtags."}
+  ];
+  var LS_KEY = "ivy_custom_topics_v1";
+  var LIMIT = 3000;   // LinkedIn's hard character limit
+  var FOLD = 210;     // roughly where LinkedIn cuts to "see more"
+  var HOOK_OK = 90;   // a first line longer than this stops being punchy
+
+  var $ = function(id){ return document.getElementById(id); };
+  var editor = $("editor");
+  var selected = DEFAULT_TOPICS[0];
+  var drafts = [];        // previous drafts, for the "Previous draft" button
+  var lastMeta = null;    // provider/model/sources of the current draft
+  var busy = false;
+
+  /* ==================== unicode formatting ====================
+     LinkedIn strips HTML from pasted text, so bold and italic are carried
+     across as mathematical sans-serif code points. Everything the editor
+     produces is serialised through here before it reaches the clipboard. */
+
+  var BASES = {
+    b:  {up:0x1D5D4, lo:0x1D5EE, dg:0x1D7EC},
+    i:  {up:0x1D608, lo:0x1D622, dg:null},
+    bi: {up:0x1D63C, lo:0x1D656, dg:0x1D7EC}
+  };
+
+  function styleChar(ch, bold, italic){
+    if(!bold && !italic) return ch;
+    var c = ch.charCodeAt(0), kind, off;
+    if(c>=65 && c<=90)      { kind="up"; off=c-65; }
+    else if(c>=97 && c<=122){ kind="lo"; off=c-97; }
+    else if(c>=48 && c<=57) { kind="dg"; off=c-48; }
+    else return ch;
+    var base = BASES[bold && italic ? "bi" : bold ? "b" : "i"][kind];
+    if(base === null) return ch;              // no italic digits exist
+    return String.fromCodePoint(base + off);
+  }
+
+  function styleRun(text, bold, italic){
+    if(!bold && !italic) return text;
+    var out = "";
+    for(var i=0;i<text.length;i++) out += styleChar(text[i], bold, italic);
+    return out;
+  }
+
+  var BLOCK = /^(DIV|P|LI|UL|OL|H[1-6]|BLOCKQUOTE|PRE)$/;
+
+  // Walk the editor and produce the exact plain text that goes to LinkedIn.
+  function serialize(root){
+    var out = "";
+    function nl(){ if(out && out.slice(-1) !== "\n") out += "\n"; }
+
+    (function walk(node, bold, italic){
+      for(var n = node.firstChild; n; n = n.nextSibling){
+        if(n.nodeType === 3){ out += styleRun(n.nodeValue, bold, italic); continue; }
+        if(n.nodeType !== 1) continue;
+
+        var tag = n.tagName;
+        if(tag === "BR"){ out += "\n"; continue; }
+
+        var st = n.style || {};
+        var w  = st.fontWeight;
+        var b2 = bold   || tag === "B" || tag === "STRONG" || w === "bold" || (+w >= 600);
+        var i2 = italic || tag === "I" || tag === "EM" || st.fontStyle === "italic";
+        var isBlock = BLOCK.test(tag);
+
+        if(isBlock) nl();
+        if(tag === "LI"){
+          var list = n.parentElement;
+          out += (list && list.tagName === "OL")
+            ? (Array.prototype.indexOf.call(list.children, n) + 1) + ". "
+            : "• ";
+        }
+        walk(n, b2, i2);
+        if(isBlock) nl();
+      }
+    })(root, false, false);
+
+    return out.replace(/\u00A0/g, " ")
+              .replace(/[ \t]+\n/g, "\n")
+              .replace(/\n{3,}/g, "\n\n")
+              .trim();
+  }
+
+  function setEditorText(text){
+    editor.innerHTML = "";
+    var lines = String(text).split("\n");
+    lines.forEach(function(line, idx){
+      if(idx) editor.appendChild(document.createElement("br"));
+      if(line) editor.appendChild(document.createTextNode(line));
+    });
+    onEditorChange();
+  }
+
+  /* ==================== topics ==================== */
+
+  function loadTopics(){
+    try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch(e){ return []; }
+  }
+  function saveTopics(list){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch(e){}
+  }
 
   function renderChips(){
-    const custom = load(), chips = $("chips"); chips.innerHTML="";
-    [...DEFAULT_TOPICS.map(t=>({t,c:false})), ...custom.map(t=>({t,c:true}))].forEach(({t,c})=>{
-      const b=document.createElement("button");
-      b.className="chip"+(t===selected?" on":""); b.type="button";
-      b.innerHTML=`<span>${escapeHtml(t)}</span>`+(c?` <span class="x" title="Remove" data-x="${escapeHtml(t)}">×</span>`:"");
-      b.onclick=(e)=>{ if(e.target.dataset.x){removeTopic(e.target.dataset.x);return;} selected=t; renderChips(); updateNote(); };
-      chips.appendChild(b);
+    var custom = loadTopics(), box = $("chips");
+    box.innerHTML = "";
+    DEFAULT_TOPICS.map(function(t){ return {t:t, custom:false}; })
+      .concat(custom.map(function(t){ return {t:t, custom:true}; }))
+      .forEach(function(item){
+        var wrap = document.createElement("span");
+        wrap.className = "chip" + (item.t === selected ? " on" : "");
+
+        var pick = document.createElement("button");
+        pick.type = "button";
+        pick.textContent = item.t;
+        pick.setAttribute("aria-pressed", item.t === selected ? "true" : "false");
+        pick.onclick = function(){ selected = item.t; renderChips(); };
+        wrap.appendChild(pick);
+
+        if(item.custom){
+          var x = document.createElement("button");
+          x.type = "button";
+          x.className = "x";
+          x.innerHTML = "&times;";
+          x.setAttribute("aria-label", "Remove topic " + item.t);
+          x.onclick = function(){ removeTopic(item.t); };
+          wrap.appendChild(x);
+        }
+        box.appendChild(wrap);
+      });
+  }
+
+  function addTopic(){
+    var input = $("newTopic"), value = input.value.trim();
+    if(!value) return;
+    var custom = loadTopics();
+    var exists = DEFAULT_TOPICS.concat(custom).some(function(t){
+      return t.toLowerCase() === value.toLowerCase();
+    });
+    if(!exists){ custom.push(value); saveTopics(custom); }
+    selected = value;
+    input.value = "";
+    renderChips();
+  }
+
+  function removeTopic(topic){
+    saveTopics(loadTopics().filter(function(t){ return t !== topic; }));
+    if(selected === topic) selected = DEFAULT_TOPICS[0];
+    renderChips();
+  }
+
+  /* ==================== status strip ==================== */
+
+  function onEditorChange(){
+    var text = serialize(editor);
+    editor.setAttribute("data-empty", text ? "false" : "true");
+
+    var chars = Array.from(text).length;
+    var over = chars > LIMIT;
+    $("countNum").textContent = chars.toLocaleString("en");
+    $("countStat").className = "stat" + (over ? " warn" : "");
+    var meter = $("countMeter");
+    meter.className = "meter" + (over ? " warn" : "");
+    meter.firstElementChild.style.transform =
+      "scaleX(" + Math.min(1, chars / LIMIT).toFixed(3) + ")";
+    $("countStat").title = over
+      ? "Over LinkedIn's 3,000 character limit by " + (chars - LIMIT)
+      : "LinkedIn allows 3,000 characters";
+
+    var firstLine = text.split("\n")[0] || "";
+    var hook = Array.from(firstLine).length;
+    $("hookNum").textContent = hook;
+    $("hookStat").className = "stat" + (hook > HOOK_OK ? " warn" : "");
+    $("hookStat").title = hook > HOOK_OK
+      ? "That first line is long. LinkedIn cuts at about " + FOLD +
+        " characters, and a hook under about " + HOOK_OK + " lands harder."
+      : "LinkedIn shows about " + FOLD + " characters before “see more”.";
+
+    $("copyBtn").disabled = !text || busy;
+    $("refineBtn").disabled = !text || busy;
+    return text;
+  }
+
+  function syncToolbar(){
+    ["bold","italic","insertUnorderedList","insertOrderedList"].forEach(function(cmd){
+      var btn = document.querySelector('.tool[data-cmd="' + cmd + '"]');
+      if(!btn) return;
+      var on = false;
+      try { on = document.queryCommandState(cmd); } catch(e){}
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
-  function addTopic(){
-    const v=$("newTopic").value.trim(); if(!v) return;
-    const custom=load();
-    if(![...DEFAULT_TOPICS,...custom].some(x=>x.toLowerCase()===v.toLowerCase())){custom.push(v);save(custom);}
-    selected=v; $("newTopic").value=""; renderChips(); updateNote();
-  }
-  function removeTopic(t){ save(load().filter(x=>x!==t)); if(selected===t) selected=DEFAULT_TOPICS[0]; renderChips(); updateNote(); }
-  function updateNote(){ $("selNote").textContent="Topic: "+selected; }
 
-  function skeleton(){
-    $("outCard").classList.remove("hidden");
-    $("out").innerHTML = '<div class="sk sk-line" style="width:92%"></div><div class="sk sk-line" style="width:88%"></div><div class="sk sk-line" style="width:95%"></div><div class="sk sk-line" style="width:70%"></div><div class="sk sk-line" style="width:80%"></div>';
-    $("modelBadge").textContent=""; $("charNote").textContent=""; $("sources").innerHTML="";
-    $("outCard").scrollIntoView({behavior:"smooth",block:"start"});
+  /* ==================== drafts ==================== */
+
+  // `previous` is captured by the caller before the skeleton wipes the editor,
+  // so an edited draft survives a refine and stays reachable.
+  function showDraft(data, previous){
+    if(previous) drafts.push({text:previous, meta:lastMeta});
+    lastMeta = data;
+    setEditorText(data.post);
+    $("empty").classList.add("hidden");
+    $("composer").classList.remove("hidden");
+    $("composer").classList.add("reveal");
+    $("refineBtn").classList.remove("hidden");
+    $("copyBtn").classList.remove("hidden");
+    $("revertBtn").disabled = drafts.length === 0;
+
+    var badge = $("modelBadge");
+    var name = data.provider === "groq" ? "Groq" : "Gemini";
+    badge.className = "badge" + (data.fellBack ? " fb" : "");
+    badge.innerHTML = '<span class="dot"></span>' +
+      escapeHtml(name + (data.model ? " · " + data.model : "") + (data.fellBack ? " (fallback)" : ""));
+
+    var box = $("sources");
+    var links = (data.sources || []).filter(function(s){ return safeUrl(s.url); });
+    if(links.length){
+      box.classList.remove("hidden");
+      box.innerHTML = '<span class="lbl">Sources</span>' + links.map(function(s){
+        return '<a class="src" href="' + escapeHtml(s.url) + '" target="_blank" rel="noopener noreferrer">' +
+               escapeHtml(s.title || hostname(s.url)) + "</a>";
+      }).join("");
+    } else {
+      box.classList.add("hidden");
+      box.innerHTML = "";
+    }
+  }
+
+  function revert(){
+    var prev = drafts.pop();
+    if(!prev) return;
+    lastMeta = prev.meta;
+    setEditorText(prev.text);
+    $("revertBtn").disabled = drafts.length === 0;
+    toast("Back to the previous draft.");
+  }
+
+  function skeleton(label){
+    $("empty").classList.add("hidden");
+    $("composer").classList.remove("hidden");
+    editor.setAttribute("aria-busy", "true");
+    editor.setAttribute("data-empty", "false");
+    editor.innerHTML =
+      '<div class="sk" style="width:86%"></div><div class="sk" style="width:94%"></div>' +
+      '<div class="sk" style="width:62%"></div><div class="sk" style="width:90%"></div>' +
+      '<div class="sk" style="width:74%"></div>';
+    $("modelBadge").textContent = label;
+    $("sources").classList.add("hidden");
+    if(window.matchMedia("(max-width:899px)").matches){
+      $("composer").scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  }
+
+  function setBusy(on, label){
+    busy = on;
+    var gen = $("genBtn");
+    gen.disabled = on;
+    $("refineBtn").disabled = on || !serialize(editor);
+    $("copyBtn").disabled = on || !serialize(editor);
+    $("sheetGo").disabled = on;
+    editor.setAttribute("contenteditable", on ? "false" : "true");
+    gen.innerHTML = on
+      ? '<span class="spin"></span>' + escapeHtml(label || "Working…")
+      : (lastMeta ? "Write a new post" : "Write the post");
+    if(!on) editor.removeAttribute("aria-busy");
+  }
+
+  /* ==================== requests ==================== */
+
+  async function post(url, body){
+    var res = await fetch(url, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
+    var data;
+    try { data = await res.json(); }
+    catch(e){ throw new Error("The server sent something we could not read. Try again."); }
+    if(!res.ok) throw new Error(data.error || "Something went wrong. Try again.");
+    return data;
   }
 
   async function generate(){
+    if(busy) return;
     hideErr();
-    const btn=$("genBtn"), regen=$("regenBtn");
-    btn.disabled=true; regen.disabled=true;
-    btn.innerHTML='<span class="spin"></span>Researching + writing…';
-    skeleton();
+    var previous = serialize(editor);
+    setBusy(true, "Researching…");
+    skeleton("Researching and writing…");
     try{
-      const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({topic:selected,guidance:$("guidance").value})});
-      const data=await r.json();
-      if(!r.ok) throw new Error(data.error||"Something went wrong.");
-      showPost(data);
-    }catch(e){ showErr(e.message); $("outCard").classList.add("hidden"); }
-    finally{ btn.disabled=false; regen.disabled=false; btn.innerHTML="✍️ Write the post"; }
+      var data = await post("/api/generate", {topic:selected, guidance:$("guidance").value});
+      showDraft(data, previous);
+      toast("Draft ready. Edit it right here.");
+    } catch(e){
+      showErr(e.message);
+      if(previous){
+        setEditorText(previous);          // put the old draft back, nothing lost
+      } else {
+        $("composer").classList.add("hidden");
+        $("empty").classList.remove("hidden");
+      }
+    } finally {
+      setBusy(false);
+      onEditorChange();
+    }
   }
 
-  function showPost(data){
-    $("outCard").classList.remove("hidden");
-    $("out").textContent=data.post;
-    const badge=$("modelBadge");
-    badge.innerHTML=`<span class="dot"></span> Written by ${data.provider==="groq"?"Groq":"Gemini"}${data.model?" · "+data.model:""}`;
-    badge.className="badge"+(data.fellBack?" fb":"");
-    if(data.fellBack) badge.innerHTML+=" (fallback)";
-    const n=data.chars;
-    $("charNote").textContent=`${n} characters${n>3000?" · over LinkedIn's 3000 limit":""}`;
-    const src=$("sources");
-    if(data.sources&&data.sources.length){
-      src.innerHTML='<span class="lbl">Sources</span>'+data.sources
-        .map(s=>`<a class="src" href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.title||hostname(s.url))}</a>`).join("");
-    } else src.innerHTML="";
+  async function refine(instruction){
+    var current = serialize(editor);
+    if(!current || busy) return;
+    closeSheet();
+    hideErr();
+    setBusy(true, "Refining…");
+    var keep = current;
+    skeleton("Refining the draft…");
+    try{
+      var data = await post("/api/refine", {
+        post: keep, instruction: instruction, topic: selected
+      });
+      showDraft(data, keep);
+      toast("Refined. “Previous draft” brings the old one back.");
+    } catch(e){
+      showErr(e.message);
+      setEditorText(keep);
+    } finally {
+      setBusy(false);
+      onEditorChange();
+    }
   }
+
+  /* ==================== refine sheet ==================== */
+
+  var lastFocus = null;
+
+  function openSheet(){
+    if(!serialize(editor)) return;
+    lastFocus = document.activeElement;
+    $("sheet").classList.add("open");
+    $("sheet").setAttribute("aria-hidden", "false");
+    $("scrim").classList.add("open");
+    setTimeout(function(){ $("refineText").focus(); }, 260);
+  }
+
+  function closeSheet(){
+    $("sheet").classList.remove("open");
+    $("sheet").setAttribute("aria-hidden", "true");
+    $("scrim").classList.remove("open");
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function renderRefineChips(){
+    var box = $("refineChips");
+    REFINEMENTS.forEach(function(r){
+      var wrap = document.createElement("span");
+      wrap.className = "chip";
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = r.label;
+      b.title = r.text;
+      b.onclick = function(){ refine(r.text); };
+      wrap.appendChild(b);
+      box.appendChild(wrap);
+    });
+  }
+
+  /* ==================== copy ==================== */
 
   async function copyPost(){
-    const btn=$("copyBtn");
-    try{ await navigator.clipboard.writeText($("out").textContent); }
-    catch{ const r=document.createRange(); r.selectNode($("out"));
-      const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r); document.execCommand("copy"); sel.removeAllRanges(); }
-    btn.textContent="✓ Copied"; btn.classList.add("done");
-    toast("Copied — paste it into LinkedIn.");
-    setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("done");},2000);
+    var text = serialize(editor);
+    if(!text) return;
+    var ok = true;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch(e){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      try { ok = document.execCommand("copy"); } catch(e2){ ok = false; }
+      document.body.removeChild(ta);
+    }
+    if(!ok){ showErr("Copying was blocked. Select the text and copy it by hand."); return; }
+    var btn = $("copyBtn");
+    btn.textContent = "Copied";
+    btn.classList.add("btn-primary", "done");
+    btn.classList.remove("btn-secondary");
+    toast("Copied. Paste it straight into LinkedIn.");
+    setTimeout(function(){
+      btn.textContent = "Copy";
+      btn.classList.remove("btn-primary", "done");
+      btn.classList.add("btn-secondary");
+    }, 2000);
   }
 
-  let tt; function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2400); }
-  function showErr(m){ const e=$("err"); e.textContent="⚠ "+m; e.style.display="block"; e.scrollIntoView({behavior:"smooth",block:"center"}); }
-  function hideErr(){ $("err").style.display="none"; }
-  function hostname(u){ try{return new URL(u).hostname.replace(/^www\./,"");}catch{return u;} }
-  function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  /* ==================== small helpers ==================== */
 
-  $("addBtn").onclick=addTopic;
-  $("newTopic").addEventListener("keydown",e=>{if(e.key==="Enter")addTopic();});
-  $("genBtn").onclick=generate; $("regenBtn").onclick=generate; $("copyBtn").onclick=copyPost;
-  renderChips(); updateNote();
+  var toastTimer;
+  function toast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+  function showErr(msg){
+    $("errMsg").textContent = msg;
+    $("err").classList.add("show");
+    $("err").scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  function hideErr(){ $("err").classList.remove("show"); }
+  function hostname(u){
+    try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return u; }
+  }
+  function safeUrl(u){
+    try {
+      var p = new URL(u).protocol;
+      return p === "http:" || p === "https:";
+    } catch(e){ return false; }
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function autoGrow(el){
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 180) + "px";
+  }
+
+  /* ==================== wiring ==================== */
+
+  $("addBtn").onclick = addTopic;
+  $("newTopic").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); addTopic(); }
+  });
+
+  ["guidance","refineText"].forEach(function(id){
+    var el = $(id);
+    el.addEventListener("input", function(){ autoGrow(el); });
+    autoGrow(el);
+  });
+
+  $("genBtn").onclick = generate;
+  $("copyBtn").onclick = copyPost;
+  $("refineBtn").onclick = openSheet;
+  $("revertBtn").onclick = revert;
+  $("scrim").onclick = closeSheet;
+  $("sheetCancel").onclick = closeSheet;
+  $("sheetGo").onclick = function(){
+    var text = $("refineText").value.trim();
+    refine(text);
+    $("refineText").value = "";
+    autoGrow($("refineText"));
+  };
+  $("refineText").addEventListener("keydown", function(e){
+    if(e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("sheetGo").click();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && $("sheet").classList.contains("open")) closeSheet();
+  });
+
+  // Formatting toolbar. execCommand is deprecated but is the only zero-dependency
+  // path that keeps the browser's native undo stack intact.
+  try { document.execCommand("styleWithCSS", false, false); } catch(e){}
+  $("toolbar").addEventListener("mousedown", function(e){
+    if(e.target.closest(".tool")) e.preventDefault();   // keep the caret in the editor
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".tool[data-cmd]"), function(btn){
+    btn.onclick = function(){
+      editor.focus();
+      try { document.execCommand(btn.dataset.cmd, false, null); } catch(e){}
+      syncToolbar();
+      onEditorChange();
+    };
+  });
+
+  editor.addEventListener("input", onEditorChange);
+  editor.addEventListener("keyup", syncToolbar);
+  editor.addEventListener("mouseup", syncToolbar);
+  editor.addEventListener("focus", function(){
+    document.body.classList.add("editing");
+    syncToolbar();
+  });
+  editor.addEventListener("blur", function(){
+    document.body.classList.remove("editing");
+  });
+  editor.addEventListener("paste", function(e){
+    e.preventDefault();
+    var text = (e.clipboardData || window.clipboardData).getData("text/plain");
+    document.execCommand("insertText", false, text);
+  });
+
+  renderChips();
+  renderRefineChips();
+  onEditorChange();
+  $("composer").classList.add("hidden");
+})();
 </script>
 </body>
 </html>
